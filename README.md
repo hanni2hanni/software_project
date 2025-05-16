@@ -1,2 +1,2 @@
 # software_project
-nku software oroject
+nku software project
