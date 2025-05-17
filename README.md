@@ -12,6 +12,7 @@ npm run dev //启动项目
 修改src目录中的文件：
 - src/route/index.js中配置路由
 - src/comonents/views/新建vue文件代表网页
+- src/App.vue中配置全局样式，也需要修改
 
 导入手势：
 `npm install axios@1.5.0 --save`
