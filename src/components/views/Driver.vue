@@ -19,14 +19,14 @@
         <router-link to="/voice-assistant" class="feature-link">启动助手</router-link>
       </div>
       <div class="feature-item small-item">
-        <h2>智能语音识别</h2>
-        <p>通过语音命令与系统交互，提高驾驶安全性。</p>
-        <router-link to="/voice-recognition" class="feature-link">了解更多</router-link>
+        <h2>智能手势识别</h2>
+        <p>通过手势与系统实现快速交互，自动完成任务。</p>
+        <router-link to="/gesture-recognition" class="feature-link">体验功能</router-link>
       </div>
       <div class="feature-item small-item">
-        <h2>情感分析系统</h2>
-        <p>实时监测驾驶员情绪，提供个性化建议。</p>
-        <router-link to="/emotion-analysis" class="feature-link">了解更多</router-link>
+        <h2>视觉识别</h2>
+        <p>实时监测驾驶员头部姿态和目光集中区域，给予安全驾驶提示。</p>
+        <router-link to="/eye-tracking" class="feature-link">开启识别</router-link>
       </div>
     </div>
     <div class="back-link-container">

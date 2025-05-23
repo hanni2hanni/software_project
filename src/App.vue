@@ -3,9 +3,6 @@
     <div ref="vantaRef" class="vanta-background"></div>
     <div class="sidebar">
       <h2>智能交互系统</h2>
-      <div class="gesture-display">
-        <h2>当前手势: {{ currentGesture }}</h2>
-      </div>
       <nav>
         <router-link to="/" class="nav-item">主页</router-link>
         <router-link to="/driver" class="nav-item">驾驶员功能</router-link>
@@ -21,11 +18,6 @@
         <h3>语音指令</h3>
         <p>说出 "帮助" 获取指令列表。</p>
       </div>
-      <div class="music-player">
-        <h3>音乐播放</h3>
-        <audio ref="audio" :src="musicSrc" @ended="onEnded" preload="auto" />
-        <button @click="playMusic">{{ isPlaying ? '暂停' : '播放' }}</button>
-      </div>
     </div>
     <div class="content">
       <router-view />
@@ -36,23 +28,16 @@
 <script>
 import * as THREE from 'three';
 import VANTA from 'vanta/src/vanta.net'; // 导入 Vanta
-import axios from 'axios';
-import music from '@/assets/music.mp3';
 
 export default {
   name: 'App',
   data() {
     return {
-      isPlaying: false,
-      musicSrc: music,
-      currentGesture: '无手势',
       vantaEffect: null // 存储 Vanta.js 实例
     };
   },
   mounted() {
     this.initVanta(); // 初始化 Vanta.js 背景效果
-    this.fetchGesture();
-    setInterval(this.fetchGesture, 2000);
   },
   beforeDestroy() {
     if (this.vantaEffect) {
@@ -75,56 +60,6 @@ export default {
         backgroundColor: 0x1d1e44,
         spacing: 12.00
       });
-    },
-    playMusic() {
-      const audio = this.$refs.audio;
-      if (!audio) {
-        console.error("Audio element not found");
-        return;
-      }
-      
-      if (this.isPlaying) {
-        audio.pause();
-      } else {
-        audio.play().catch(error => {
-          console.error("Error playing audio:", error);
-        });
-      }
-      this.isPlaying = !this.isPlaying;
-    },
-    onEnded() {
-      this.isPlaying = false;
-    },
-    async fetchGesture() {
-      try {
-        const response = await axios.get('http://localhost:5000/api/gesture');
-        this.currentGesture = response.data.gesture;
-        this.handleGesture(response.data.gesture);
-      } catch (error) {
-        console.error('Error fetching gesture:', error);
-      }
-    },
-    handleGesture(gesture) {
-      switch (gesture) {
-        case '握拳':
-          this.pauseMusic();
-          break;
-        case '竖拇指':
-          // 处理竖拇指手势的逻辑
-          break;
-        case '挥手':
-          // 处理挥手手势的逻辑
-          break;
-        default:
-          console.log('无手势');
-      }
-    },
-    pauseMusic() {
-      const audio = this.$refs.audio;
-      if (this.isPlaying) {
-        audio.pause();
-        this.isPlaying = false;
-      }
     },
   },
 };
@@ -167,37 +102,6 @@ h2 {
 
 .battery-level {
   color: #f39c12; /* 电池电量颜色 */
-}
-
-.music-player {
-  margin-top: 20px; /* 顶部间距 */
-}
-
-.music-player h3 {
-  margin-bottom: 10px; /* 标题底部间距 */
-}
-
-.music-player button {
-  background-color: #3498db; /* 按钮背景色 */
-  color: #ffffff; /* 按钮文字颜色 */
-  border: none; /* 去掉边框 */
-  padding: 8px 16px; /* 内边距 */
-  font-size: 14px; /* 字体大小 */
-  border-radius: 5px; /* 圆角效果 */
-  cursor: pointer; /* 鼠标悬停时显示手型 */
-  transition: background-color 0.3s, transform 0.2s; /* 过渡效果 */
-}
-
-.music-player button:hover {
-  background-color: #2980b9; /* 悬停时背景色 */
-}
-
-.music-player button:active {
-  transform: scale(0.95); /* 点击时按钮缩小 */
-}
-
-.music-player button:focus {
-  outline: none; /* 去掉焦点时的默认边框 */
 }
 
 .vanta-background {
