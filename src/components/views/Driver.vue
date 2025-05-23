@@ -36,54 +36,8 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   name: 'Driver',
-  data() {
-    return {
-      currentGesture: '未识别手势'
-    };
-  },
-  mounted() {
-    this.fetchGesture();
-    setInterval(this.fetchGesture, 3000); // 每3秒获取一次手势
-  },
-  methods: {
-    async fetchGesture() {
-      try {
-        const response = await axios.get('http://localhost:5000/api/gesture');
-        console.log('Response:', response.data);
-        this.currentGesture = response.data.gesture;
-      } catch (error) {
-        console.error('Error fetching gesture:', error);
-      }
-    },
-    handleGesture(gesture) {
-      switch (gesture) {
-        case '握拳':
-          this.startNavigation();
-          break;
-        case '竖拇指':
-          this.checkVehicleStatus();
-          break;
-        case '挥手':
-          this.startVoiceAssistant();
-          break;
-        default:
-          console.log('未识别的手势');
-      }
-    },
-    startNavigation() {
-      this.$router.push('/navigation'); // 跳转到导航页面
-    },
-    checkVehicleStatus() {
-      this.$router.push('/vehicle-status'); // 跳转到车辆状态页面
-    },
-    startVoiceAssistant() {
-      this.$router.push('/voice-assistant'); // 跳转到语音助手页面
-    }
-  }
 };
 </script>
 
@@ -99,7 +53,7 @@ export default {
   background-color: transparent; /* 背景透明 */
 }
 
-h1{
+h1 {
   margin: 0; /* 去掉默认的间距 */
 }
 

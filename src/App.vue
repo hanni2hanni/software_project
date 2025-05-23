@@ -96,6 +96,25 @@ h2 {
   margin-top: 20px; /* 顶部间距 */
 }
 
+.voice-command {
+  padding: 16px;
+  border: 2px solid #3498db;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.voice-command-link {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.voice-command-link:hover {
+  background: rgba(255, 255, 255, 0.1); /* 悬停效果 */
+}
+
 .status-active {
   color: #2ecc71; /* 在线状态颜色 */
 }
