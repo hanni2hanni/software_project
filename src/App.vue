@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <div ref="vantaRef" class="vanta-background"></div>
-    <div class="sidebar">
+    <div v-if="isLoggedIn" class="sidebar">
       <h2>智能交互系统</h2>
       <nav>
         <router-link to="/" class="nav-item">主页</router-link>
-        <router-link to="/driver" class="nav-item">驾驶员功能</router-link>
-        <router-link to="/admin" class="nav-item">系统管理</router-link>
-        <router-link to="/maintenance" class="nav-item">车辆维护</router-link>
+        <router-link v-if="userRole === 'driver'" to="/driver" class="nav-item">驾驶员功能</router-link>
+        <router-link v-if="userRole === 'admin'" to="/admin" class="nav-item">系统管理</router-link>
+        <router-link v-if="userRole === 'maintenance'" to="/maintenance" class="nav-item">车辆维护</router-link>
       </nav>
       <div class="status">
         <h3>系统状态</h3>
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'; // 导入 Vuex 的 getter
 import * as THREE from 'three';
 import VANTA from 'vanta/src/vanta.net'; // 导入 Vanta
 
@@ -33,8 +34,11 @@ export default {
   name: 'App',
   data() {
     return {
-      vantaEffect: null // 存储 Vanta.js 实例
+      vantaEffect: null, // 存储 Vanta.js 实例
     };
+  },
+  computed: {
+    ...mapGetters(['isLoggedIn', 'userRole']), // 获取登录状态和用户角色
   },
   mounted() {
     this.initVanta(); // 初始化 Vanta.js 背景效果
@@ -52,20 +56,22 @@ export default {
         mouseControls: true,
         touchControls: true,
         gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
+        minHeight: 200.0,
+        minWidth: 200.0,
+        scale: 1.0,
+        scaleMobile: 1.0,
         color: 0x3b7dae,
         backgroundColor: 0x1d1e44,
-        spacing: 12.00
+        spacing: 12.0,
       });
     },
   },
 };
 </script>
 
+
 <style>
+/* 样式保持不变 */
 #app {
   display: flex;
   height: 100vh;

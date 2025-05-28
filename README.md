@@ -31,3 +31,8 @@ from flask_cors import CORS  # 导入 CORS
 npm install vanta@0.5.24
 npm install three@0.121.0
 ```
+
+安装vuex
+```
+npm install vuex@3
+```
