@@ -14,7 +14,9 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "axios": "^1.5.0",
+    "element-ui": "^2.15.14",
     "three": "^0.121.0",
     "vanta": "^0.5.24",
     "vue": "^2.5.2",

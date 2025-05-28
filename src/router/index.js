@@ -5,10 +5,11 @@ import Login from '../components/views/Login.vue'
 import Driver from '../components/views/Driver.vue'
 import Admin from '../components/views/Admin.vue'
 import Maintenance from '../components/views/Maintenance.vue'
+import Navigation from '../components/views/Navigation.vue'
 import VoiceAssistant from '../components/views/VoiceAssistant.vue'
 import GestureRecognition from '../components/views/GestureRecognition.vue'
 import EyeTracking from '../components/views/EyeTracking.vue'
-import store from '../store' // 导入 Vuex store
+import store from '../store'
 
 Vue.use(Router)
 
@@ -57,6 +58,11 @@ const router = new Router({
       path: '/eye-tracking',
       name: 'EyeTracking',
       component: EyeTracking
+    },
+    {
+      path: '/navigation',
+      name: 'Navigation',
+      component: Navigation
     }
   ]
 })

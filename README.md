@@ -36,3 +36,13 @@ npm install three@0.121.0
 ```
 npm install vuex@3
 ```
+
+添加高德地图API
+```
+npm i @amap/amap-jsapi-loader --save  
+```
+
+安装element-ui
+```
+npm i element-ui -S
+```
