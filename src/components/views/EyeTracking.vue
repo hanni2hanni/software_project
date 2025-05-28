@@ -18,43 +18,43 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 
 export default {
   name: 'GazeTracking',
-  data() {
+  data () {
     return {
-      gazeStatus: '加载中...',          // 更新目光状态
-      headMovementStatus: '加载中...'   // 新增头部运动状态
-    };
+      gazeStatus: '加载中...', // 更新目光状态
+      headMovementStatus: '加载中...' // 新增头部运动状态
+    }
   },
-  mounted() {
-    this.fetchEyeTracking();           // 初始化获取目光追踪状态
-    this.fetchHeadMovement();          // 初始化获取头部运动状态
-    setInterval(this.fetchEyeTracking, 500);  // 每0.5秒获取一次目光状态
-    setInterval(this.fetchHeadMovement, 500); // 每0.5秒获取一次头部运动状态
+  mounted () {
+    this.fetchEyeTracking() // 初始化获取目光追踪状态
+    this.fetchHeadMovement() // 初始化获取头部运动状态
+    setInterval(this.fetchEyeTracking, 500) // 每0.5秒获取一次目光状态
+    setInterval(this.fetchHeadMovement, 500) // 每0.5秒获取一次头部运动状态
   },
   methods: {
-    async fetchEyeTracking() {
+    async fetchEyeTracking () {
       try {
-        const response = await axios.get('http://localhost:5000/api/eye-tracking');
-        this.gazeStatus = response.data['eye-tracking']; // 更新目光状态
-        console.log('Gaze tracking data:', response.data);
+        const response = await axios.get('http://localhost:5000/api/eye-tracking')
+        this.gazeStatus = response.data['eye-tracking'] // 更新目光状态
+        console.log('Gaze tracking data:', response.data)
       } catch (error) {
-        console.error('Error fetching gaze tracking data:', error);
+        console.error('Error fetching gaze tracking data:', error)
       }
     },
-    async fetchHeadMovement() {
+    async fetchHeadMovement () {
       try {
-        const response = await axios.get('http://localhost:5000/api/head-movement');
-        this.headMovementStatus = response.data['head_movement']; // 更新头部运动状态
-        console.log('Head movement data:', response.data);
+        const response = await axios.get('http://localhost:5000/api/head-movement')
+        this.headMovementStatus = response.data['head_movement'] // 更新头部运动状态
+        console.log('Head movement data:', response.data)
       } catch (error) {
-        console.error('Error fetching head movement data:', error);
+        console.error('Error fetching head movement data:', error)
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style scoped>

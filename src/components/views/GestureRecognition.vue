@@ -26,51 +26,51 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 import music from '@/assets/music.mp3'
 
 export default {
   name: 'GestureRecognition',
-  data() {
+  data () {
     return {
       gestureStatus: '加载中...',
       musicSource: music
-    };
+    }
   },
-  mounted() {
-    this.fetchGestureStatus(); // 初始化获取手势状态
-    setInterval(this.fetchGestureStatus, 2000); // 每2秒获取一次手势状态
+  mounted () {
+    this.fetchGestureStatus() // 初始化获取手势状态
+    setInterval(this.fetchGestureStatus, 2000) // 每2秒获取一次手势状态
   },
   methods: {
-    async fetchGestureStatus() {
+    async fetchGestureStatus () {
       try {
-        const response = await axios.get('http://localhost:5000/api/gesture'); // 假设后端提供手势识别的 API
-        this.gestureStatus = response.data['gesture'];
+        const response = await axios.get('http://localhost:5000/api/gesture') // 假设后端提供手势识别的 API
+        this.gestureStatus = response.data['gesture']
 
         // 根据手势状态控制音乐
-        this.controlMusic(this.gestureStatus);
+        this.controlMusic(this.gestureStatus)
       } catch (error) {
-        console.error('Error fetching gesture data:', error);
+        console.error('Error fetching gesture data:', error)
       }
     },
-    controlMusic(gesture) {
-      const audio = this.$refs.audio;
+    controlMusic (gesture) {
+      const audio = this.$refs.audio
       switch (gesture) {
         case '握拳':
-          audio.pause(); // 停止音乐
-          break;
+          audio.pause() // 停止音乐
+          break
         case '竖拇指':
-          audio.play(); // 开始音乐
-          break;
+          audio.play() // 开始音乐
+          break
         case '挥手':
-          this.$router.push('/driver'); // 返回驾驶员主页
-          break;
+          this.$router.push('/driver') // 返回驾驶员主页
+          break
         default:
-          break;
+          break
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style scoped>

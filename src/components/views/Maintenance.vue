@@ -28,11 +28,11 @@
 export default {
   name: 'Maintenance',
   methods: {
-    generateReport() {
-      alert('维护报告已生成！');
-    },
-  },
-};
+    generateReport () {
+      alert('维护报告已生成！')
+    }
+  }
+}
 </script>
 
 <style scoped>

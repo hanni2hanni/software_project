@@ -19,28 +19,28 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions } from 'vuex'
 
 export default {
-  data() {
+  data () {
     return {
       username: '',
       password: '',
       errorMessage: ''
-    };
+    }
   },
   methods: {
     ...mapActions(['login']),
-    async handleLogin() {
+    async handleLogin () {
       try {
-        await this.login({ username: this.username, password: this.password });
-        this.$router.push({ name: 'Home' });
+        await this.login({ username: this.username, password: this.password })
+        this.$router.push({ name: 'Home' })
       } catch (error) {
-        this.errorMessage = error.message || '登录失败，请检查用户名和密码。';
+        this.errorMessage = error.message || '登录失败，请检查用户名和密码。'
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>

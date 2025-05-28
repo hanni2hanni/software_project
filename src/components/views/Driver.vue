@@ -37,8 +37,8 @@
 
 <script>
 export default {
-  name: 'Driver',
-};
+  name: 'Driver'
+}
 </script>
 
 <style scoped>

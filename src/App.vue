@@ -26,30 +26,30 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'; // 导入 Vuex 的 getter
-import * as THREE from 'three';
-import VANTA from 'vanta/src/vanta.net'; // 导入 Vanta
+import { mapGetters } from 'vuex' // 导入 Vuex 的 getter
+import * as THREE from 'three'
+import VANTA from 'vanta/src/vanta.net' // 导入 Vanta
 
 export default {
   name: 'App',
-  data() {
+  data () {
     return {
-      vantaEffect: null, // 存储 Vanta.js 实例
-    };
+      vantaEffect: null // 存储 Vanta.js 实例
+    }
   },
   computed: {
-    ...mapGetters(['isLoggedIn', 'userRole']), // 获取登录状态和用户角色
+    ...mapGetters(['isLoggedIn', 'userRole']) // 获取登录状态和用户角色
   },
-  mounted() {
-    this.initVanta(); // 初始化 Vanta.js 背景效果
+  mounted () {
+    this.initVanta() // 初始化 Vanta.js 背景效果
   },
-  beforeDestroy() {
+  beforeDestroy () {
     if (this.vantaEffect) {
-      this.vantaEffect.destroy(); // 销毁 Vanta.js 实例以防内存泄漏
+      this.vantaEffect.destroy() // 销毁 Vanta.js 实例以防内存泄漏
     }
   },
   methods: {
-    initVanta() {
+    initVanta () {
       this.vantaEffect = VANTA({
         el: this.$refs.vantaRef,
         THREE: THREE,
@@ -62,13 +62,12 @@ export default {
         scaleMobile: 1.0,
         color: 0x3b7dae,
         backgroundColor: 0x1d1e44,
-        spacing: 12.0,
-      });
-    },
-  },
-};
+        spacing: 12.0
+      })
+    }
+  }
+}
 </script>
-
 
 <style>
 /* 样式保持不变 */
