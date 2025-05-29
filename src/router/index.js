@@ -42,7 +42,7 @@ const router = new Router({
       path: '/admin',
       name: 'Admin',
       component: Admin,
-      meta: { requiresRole: 'admin' } // 需要管理员角色
+      meta: { requiresRole: 'system_administrator' } // 需要管理员角色
     },
     {
       path: '/user-management',
@@ -68,7 +68,7 @@ const router = new Router({
       path: '/maintenance',
       name: 'Maintenance',
       component: Maintenance,
-      meta: { requiresRole: 'maintenance' } // 需要维护人员角色
+      meta: { requiresRole: 'vehicle_maintenance' } // 需要维护人员角色
     },
     {
       path: '/voice-assistant',

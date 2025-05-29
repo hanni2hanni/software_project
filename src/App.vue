@@ -2,17 +2,20 @@
   <div id="app">
     <div ref="vantaRef" class="vanta-background"></div>
     <div v-if="isLoggedIn" class="sidebar">
+      <h2>车载多模态</h2>
       <h2>智能交互系统</h2>
       <nav>
         <router-link to="/" class="nav-item">主页</router-link>
         <router-link v-if="userRole === 'driver'" to="/driver" class="nav-item">驾驶员功能</router-link>
-        <router-link v-if="userRole === 'admin'" to="/admin" class="nav-item">系统管理</router-link>
-        <router-link v-if="userRole === 'maintenance'" to="/maintenance" class="nav-item">车辆维护</router-link>
+        <router-link v-if="userRole === 'system_administrator'" to="/admin" class="nav-item">系统管理</router-link>
+        <router-link v-if="userRole === 'vehicle_maintenance'" to="/maintenance" class="nav-item">车辆维护</router-link>
       </nav>
       <div class="status">
         <h3>系统状态</h3>
+        <p>当前时间: <span class="current-time">{{ currentTime }}</span></p>
         <p>当前状态: <span class="status-active">在线</span></p>
         <p>电池电量: <span class="battery-level">75%</span></p>
+        <p>空调状态: <span class="ac-status">{{ acStatus }}</span></p> <!-- 新增空调状态 -->
       </div>
       <div class="voice-command">
         <h3>语音指令</h3>
@@ -34,7 +37,9 @@ export default {
   name: 'App',
   data () {
     return {
-      vantaEffect: null // 存储 Vanta.js 实例
+      vantaEffect: null, // 存储 Vanta.js 实例
+      currentTime: '',  // 当前时间
+      acStatus: '关闭' // 假设空调初始状态为关闭
     }
   },
   computed: {
@@ -42,6 +47,8 @@ export default {
   },
   mounted () {
     this.initVanta() // 初始化 Vanta.js 背景效果
+    this.updateTime() // 初始化时间
+    setInterval(this.updateTime, 1000) // 每秒更新一次时间
   },
   beforeDestroy () {
     if (this.vantaEffect) {
@@ -64,6 +71,10 @@ export default {
         backgroundColor: 0x1d1e44,
         spacing: 12.0
       })
+    },
+    updateTime() {
+      const now = new Date();
+      this.currentTime = now.toLocaleTimeString();
     }
   }
 }
@@ -98,7 +109,7 @@ h2 {
 }
 
 .status, .voice-command {
-  margin-top: 20px; /* 顶部间距 */
+  margin-top: 40px; /* 顶部间距 */
 }
 
 .status-active {
@@ -107,6 +118,15 @@ h2 {
 
 .battery-level {
   color: #f39c12; /* 电池电量颜色 */
+}
+
+.current-time {
+  font-weight: bold; /* 加粗时间显示 */
+  color: #ecf0f1; /* 时间颜色 */
+}
+
+.ac-status {
+  color: #3498db; /* 空调状态颜色 */
 }
 
 .vanta-background {

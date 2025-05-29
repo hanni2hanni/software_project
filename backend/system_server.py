@@ -7,7 +7,7 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-USER_FILE = "system_management/user_profiles.json"
+USER_FILE = os.path.join(os.path.dirname(__file__), 'system_management', 'user_profiles.json')
 
 # --- 用户管理相关函数 ---
 def load_users():
@@ -102,6 +102,34 @@ def delete_user():
     del users[uid]
     save_users(users)
     return jsonify({"message": "用户删除成功"})
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+    print(username, password)
+
+    users = load_users()
+    user = None
+    for user_id, user_info in users.items():
+        if user_info.get("name") == username:  # 用name字段比对
+            user = user_info
+            break
+
+    if user is None:
+        return jsonify({"error": "用户不存在"}), 404
+
+    # 假设每个用户都存储一个"password"字段来进行验证
+    if password != None:  # 替换为真实的密码验证逻辑
+        return jsonify({
+            "message": "登录成功",
+            "role": user.get("role"),  # 返回用户角色
+            "name": user.get("name")   # 返回用户名
+        })
+    else:
+        return jsonify({"error": "密码错误"}), 401
+
 
 # --- 日志接口 ---
 @app.route('/api/logs', methods=['GET'])

@@ -1,50 +1,51 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import axios from 'axios';
+import Vue from 'vue';
+import Vuex from 'vuex';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     isLoggedIn: false, // 用户登录状态
-    userRole: null // 用户角色
+    userRole: null, // 用户角色
+    username: null // 用户名
   },
   mutations: {
-    setLogin (state, payload) {
-      state.isLoggedIn = payload
+    setLogin(state, payload) {
+      state.isLoggedIn = payload;
     },
-    setUserRole (state, role) {
-      state.userRole = role // 设置用户角色
+    setUserRole(state, role) {
+      state.userRole = role; // 设置用户角色
+    },
+    setUsername(state, name) {
+      state.username = name; // 设置用户名
     }
   },
   actions: {
-    async login ({ commit }, { username, password }) {
-      // 模拟用户数据（实际项目中应该从后端获取）
-      const mockUsers = [
-        { username: 'admin', password: 'password', role: 'admin' },
-        { username: 'driver', password: 'password', role: 'driver' },
-        { username: 'maintenance', password: 'password', role: 'maintenance' },
-        { username: 'passenger', password: 'password', role: 'passenger' }
-      ]
-
-      // 查找匹配的用户
-      const user = mockUsers.find(
-        (u) => u.username === username && u.password === password
-      )
-
-      if (user) {
-        commit('setLogin', true) // 登录成功
-        commit('setUserRole', user.role) // 设置用户角色
-      } else {
-        throw new Error('用户名或密码错误')
+    async login({ commit }, { username, password }) {
+      try {
+        const response = await axios.post('http://localhost:5000/login', { username, password });
+        commit('setLogin', true); // 登录成功
+        commit('setUserRole', response.data.role); // 设置用户角色
+        commit('setUsername', response.data.name); // 设置用户名
+      } catch (error) {
+        // 捕获错误并抛出以供前端处理
+        if (error.response) {
+          throw new Error(error.response.data.error || '登录失败');
+        } else {
+          throw new Error('登录请求失败');
+        }
       }
     },
-    logout ({ commit }) {
-      commit('setLogin', false) // 退出登录
-      commit('setUserRole', null) // 清除用户角色
+    logout({ commit }) {
+      commit('setLogin', false); // 退出登录
+      commit('setUserRole', null); // 清除用户角色
+      commit('setUsername', null); // 清除用户名
     }
   },
   getters: {
-    isLoggedIn: (state) => state.isLoggedIn, // 返回登录状态
-    userRole: (state) => state.userRole // 返回用户角色
+    isLoggedIn: (state) => state.isLoggedIn,
+    userRole: (state) => state.userRole,
+    username: (state) => state.username // 新增 getter
   }
-})
+});
