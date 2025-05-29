@@ -1,0 +1,479 @@
+{
+    "guest_user": {
+        "name": "访客",
+        "role": "passenger",
+        "common_commands": {},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    },
+    "driver_1": {
+        "name": "刘沛鑫",
+        "role": "driver",
+        "common_commands": {},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    },
+    "passenger_1": {
+        "name": "高艺轩",
+        "role": "passenger",
+        "common_commands": {},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    },
+    "maintenance_1": {
+        "name": "延嵩",
+        "role": "vehicle_maintenance",
+        "common_commands": {},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    },
+    "admin_1": {
+        "name": "张瑜",
+        "role": "system_administrator",
+        "common_commands": {},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    },
+    "driver_2": {
+        "name": "房书睿",
+        "role": "driver",
+        "common_commands": {},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    },
+    "passenger_2": {
+        "name": "刘阳",
+        "role": "passenger",
+        "common_commands": {"打开音乐":"打开音乐"},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    },
+    "passenger_3": {
+        "name": "冯子函",
+        "role": "passenger",
+        "common_commands": {},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    },
+    "maintenance_2": {
+        "name": "崔交军",
+        "role": "vehicle_maintenance",
+        "common_commands": {},
+        "interaction_habits": {},
+        "feedback_preferences": {
+            "USER_DISTRACTED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_dashboard_light",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "COMMAND_SUCCESS": {
+                "enabled_modalities": [
+                    "voice_brief",
+                    "visual_graphic_feedback"
+                ],
+                "text_display_enabled": false
+            },
+            "COMMAND_FAILURE": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "PERMISSION_DENIED": {
+                "enabled_modalities": [
+                    "voice",
+                    "text_display",
+                    "visual_graphic_feedback",
+                    "visual_dashboard_light"
+                ],
+                "voice_detail_level": "brief"
+            },
+            "GENERIC_INFO": {
+                "enabled_modalities": [
+                    "text_display",
+                    "visual_graphic_feedback"
+                ],
+                "voice_detail_level": "normal"
+            },
+            "general_voice_volume": 70,
+            "disable_all_audio_feedback": false,
+            "visual_graphic_feedback_enabled": true,
+            "visual_animation_enabled": true
+        }
+    }
+}
