@@ -3,20 +3,15 @@
     <h1>驾驶员页面</h1>
     <p>欢迎回来，驾驶员！请查看以下功能：</p>
     <div class="features">
-      <div class="feature-item large-item">
-        <h2>实时导航</h2>
-        <p>获取实时导航信息，帮助您安全到达目的地。</p>
-        <router-link to="/navigation" class="feature-link">开始导航</router-link>
-      </div>
-      <div class="feature-item small-item">
-        <h2>车辆状态监控</h2>
-        <p>随时查看车辆的状态，包括油量、温度和电池健康。</p>
-        <router-link to="/vehicle-status" class="feature-link">查看状态</router-link>
-      </div>
-      <div class="feature-item small-item">
+      <div class="feature-item long-item">
         <h2>语音助手</h2>
         <p>使用语音助手发出指令，控制车载系统。</p>
         <router-link to="/voice-assistant" class="feature-link">启动助手</router-link>
+      </div>
+      <div class="feature-item high-item">
+        <h2>实时导航</h2>
+        <p>利用高德地图提供实时导航信息，为您提供精准的地图信息和语音导航。</p>
+        <router-link to="/navigation" class="feature-link">开始导航</router-link>
       </div>
       <div class="feature-item small-item">
         <h2>智能手势识别</h2>
@@ -71,10 +66,15 @@ h1 {
   background-color: rgba(52, 152, 219, 0.1); /* 半透明背景 */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s, background-color 0.3s;
+  text-align: center; /* 内容居中 */
 }
 
-.large-item {
+.long-item {
   grid-column: span 2; /* 大卡片占用两列 */
+}
+
+.high-item {
+  grid-row: span 2; /* 中卡片占用两行 */
 }
 
 .feature-item:hover {
