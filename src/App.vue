@@ -19,7 +19,7 @@
       </div>
       <div class="voice-command">
         <h3>语音指令</h3>
-        <p>说出 "帮助" 获取指令列表。</p>
+        <p>说出 “开始录音” 开始进行语音识别。</p>
       </div>
     </div>
     <div class="content">
