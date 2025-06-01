@@ -29,40 +29,40 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 
 export default {
   name: 'UserManagement',
-  data() {
+  data () {
     return {
-      users: [],
-    };
-  },
-  methods: {
-    fetchUsers() {
-      axios.get('http://127.0.0.1:5000/users')
-        .then(response => {
-          this.users = response.data.users;
-        })
-        .catch(err => {
-          console.error('加载用户失败:', err);
-        });
-    },
-    deleteUser(id) {
-      if (!confirm(`确定删除用户 "${id}" 吗？`)) return;
-      axios.post('http://127.0.0.1:5000/delete_user', { id })
-        .then(() => {
-          this.fetchUsers();
-        })
-        .catch(err => {
-          console.error('删除失败:', err);
-        });
+      users: []
     }
   },
-  mounted() {
-    this.fetchUsers();
+  methods: {
+    fetchUsers () {
+      axios.get('http://127.0.0.1:5000/users')
+        .then(response => {
+          this.users = response.data.users
+        })
+        .catch(err => {
+          console.error('加载用户失败:', err)
+        })
+    },
+    deleteUser (id) {
+      if (!confirm(`确定删除用户 "${id}" 吗？`)) return
+      axios.post('http://127.0.0.1:5000/delete_user', { id })
+        .then(() => {
+          this.fetchUsers()
+        })
+        .catch(err => {
+          console.error('删除失败:', err)
+        })
+    }
+  },
+  mounted () {
+    this.fetchUsers()
   }
-};
+}
 </script>
 
 <style scoped>

@@ -65,11 +65,11 @@
 
 <script>
 export default {
-  name: "SystemSettings",
-  data() {
+  name: 'SystemSettings',
+  data () {
     return {
       settings: {
-        performanceMode: "normal",
+        performanceMode: 'normal',
         voiceSensitivity: 5,
         gestureRecognitionEnabled: true,
         visualRecognitionEnabled: true,
@@ -78,37 +78,37 @@ export default {
         customModes: {
           voiceFeedback: true,
           visualFeedback: true,
-          hapticFeedback: false,
+          hapticFeedback: false
         },
-        autoUpdateEnabled: false,
-      },
-    };
+        autoUpdateEnabled: false
+      }
+    }
   },
   methods: {
-    saveSettings() {
+    saveSettings () {
       this.$message({
-        message: "设置已保存！",
-        type: "success",
-        duration: 2000,
-      });
+        message: '设置已保存！',
+        type: 'success',
+        duration: 2000
+      })
     },
-    analyzePreferences() {
+    analyzePreferences () {
       this.$message({
-        message: "正在分析用户偏好，请稍候...",
-        type: "info",
-        duration: 2000,
-      });
+        message: '正在分析用户偏好，请稍候...',
+        type: 'info',
+        duration: 2000
+      })
 
       setTimeout(() => {
         this.$message({
-          message: "用户偏好分析报告已生成！",
-          type: "success",
-          duration: 3000,
-        });
-      }, 2000);
-    },
-  },
-};
+          message: '用户偏好分析报告已生成！',
+          type: 'success',
+          duration: 3000
+        })
+      }, 2000)
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -236,7 +236,6 @@ button:hover {
   width: 100%;
   padding-left: 0; /* 去掉多余的左内边距 */
 }
-
 
 .back-link {
   display: inline-block;

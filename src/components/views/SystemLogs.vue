@@ -32,53 +32,53 @@
 <script>
 export default {
   name: 'SystemLogs',
-  data() {
+  data () {
     return {
       logs: [],
-      errorMessage: '',
-    };
+      errorMessage: ''
+    }
   },
-  async mounted() {
+  async mounted () {
     try {
-      const response = await fetch('http://localhost:5000/api/logs');
+      const response = await fetch('http://localhost:5000/api/logs')
       if (!response.ok) {
-        throw new Error(`HTTP 错误: ${response.status} ${response.statusText}`);
+        throw new Error(`HTTP 错误: ${response.status} ${response.statusText}`)
       }
-      const csvData = await response.text();
+      const csvData = await response.text()
       if (!csvData.trim()) {
-        throw new Error('日志数据为空');
+        throw new Error('日志数据为空')
       }
-      this.parseCSV(csvData);
+      this.parseCSV(csvData)
     } catch (error) {
-      console.error('获取日志失败:', error);
-      this.errorMessage = error.message;
-      this.logs = [];
+      console.error('获取日志失败:', error)
+      this.errorMessage = error.message
+      this.logs = []
     }
   },
   methods: {
-    parseCSV(csv) {
-      const lines = csv.trim().split('\n');
+    parseCSV (csv) {
+      const lines = csv.trim().split('\n')
       if (lines.length < 1) {
-        throw new Error('CSV 数据无效');
+        throw new Error('CSV 数据无效')
       }
 
-      const headers = lines[0].split(',').map(header => header.trim());
+      const headers = lines[0].split(',').map(header => header.trim())
       if (headers.length < 4 || headers[0] !== 'Timestamp') {
-        throw new Error('CSV 标题格式错误');
+        throw new Error('CSV 标题格式错误')
       }
 
       this.logs = lines.slice(1).map(line => {
-        const values = line.split(',').map(val => val.trim());
+        const values = line.split(',').map(val => val.trim())
         return {
           Timestamp: values[0] || '',
           Username: values[1] || '',
           Mode: values[2] || '',
           Action: values[3] || ''
-        };
-      });
-    },
-  },
-};
+        }
+      })
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -108,7 +108,6 @@ h1 {
   width: 100%;
   padding-left: 0; /* 去掉多余的左内边距 */
 }
-
 
 .back-link {
   display: inline-block;

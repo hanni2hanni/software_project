@@ -1,7 +1,6 @@
 <template>
   <div class="navigation">
     <h1>地图导航</h1>
-    
     <!-- 地址输入框 -->
     <div class="search-container">
       <el-autocomplete
@@ -38,10 +37,11 @@ export default {
   name: 'Navigation',
   data () {
     return {
-      map: null,          // 地图实例
-      marker: null,       // 当前标记点
-      searchQuery: '',    // 搜索框内容
-      center: [116.397428, 39.90923] // 默认地图中心点
+      map: null, // 地图实例
+      marker: null, // 当前标记点
+      searchQuery: '', // 搜索框内容
+      center: [116.397428, 39.90923], // 默认地图中心点
+      AMap: null // 用于存储 AMap 实例
     }
   },
   mounted () {
@@ -58,26 +58,26 @@ export default {
       window._AMapSecurityConfig = {
         securityJsCode: '0079d087436433aedd5e5d1d40c36add'
       }
-      
-      const AMap = await AMapLoader.load({
+
+      this.AMap = await AMapLoader.load({ // 将 AMap 存储到组件的数据中
         key: '421d9632fe6cac6c95418e8717f99608',
         version: '2.0',
         plugins: ['AMap.Marker', 'AMap.ToolBar', 'AMap.Scale', 'AMap.Autocomplete', 'AMap.PlaceSearch']
       })
 
       // 创建地图实例
-      this.map = new AMap.Map('map-container', {
-        viewMode: "2D",
+      this.map = new this.AMap.Map('map-container', {
+        viewMode: '2D',
         center: this.center,
         zoom: 11
       })
 
       // 添加工具条和比例尺
-      this.map.addControl(new AMap.ToolBar())
-      this.map.addControl(new AMap.Scale())
+      this.map.addControl(new this.AMap.ToolBar())
+      this.map.addControl(new this.AMap.Scale())
 
       // 初始化标记点
-      this.marker = new AMap.Marker({
+      this.marker = new this.AMap.Marker({
         position: this.center,
         title: '当前位置'
       })
@@ -92,7 +92,7 @@ export default {
         return
       }
 
-      const placeSearch = new AMap.PlaceSearch({
+      const placeSearch = new this.AMap.PlaceSearch({ // 使用 this.AMap
         city: '全国' // 可以根据需要指定城市
       })
 

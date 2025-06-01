@@ -13,25 +13,25 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from 'vuex'
 
 export default {
-  data() {
+  data () {
     return {
       currentTime: '' // 用于存储当前时间
-    };
+    }
   },
   computed: {
     ...mapGetters(['username', 'userRole']) // 从 Vuex 获取用户名和用户角色
   },
-  mounted() {
-    this.updateTime(); // 初始化时间
-    setInterval(this.updateTime, 1000); // 每秒更新一次时间
+  mounted () {
+    this.updateTime() // 初始化时间
+    setInterval(this.updateTime, 1000) // 每秒更新一次时间
   },
   methods: {
-    updateTime() {
-      const now = new Date();
-      this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    updateTime () {
+      const now = new Date()
+      this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   }
 }

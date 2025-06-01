@@ -38,7 +38,7 @@ export default {
   data () {
     return {
       vantaEffect: null, // 存储 Vanta.js 实例
-      currentTime: '',  // 当前时间
+      currentTime: '', // 当前时间
       acStatus: '关闭' // 假设空调初始状态为关闭
     }
   },
@@ -72,9 +72,9 @@ export default {
         spacing: 12.0
       })
     },
-    updateTime() {
-      const now = new Date();
-      this.currentTime = now.toLocaleTimeString();
+    updateTime () {
+      const now = new Date()
+      this.currentTime = now.toLocaleTimeString()
     }
   }
 }

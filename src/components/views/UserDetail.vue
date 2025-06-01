@@ -2,7 +2,6 @@
   <div class="detail-container" v-if="userData">
     <h1>用户详情: {{ userId }}</h1>
 
-
     <div class="features">
       <div class="feature-item small-item">
         <h2 class="section-title">基本信息</h2>
@@ -80,36 +79,36 @@
 
 <script>
 export default {
-  name: "UserDetail",
-  data() {
+  name: 'UserDetail',
+  data () {
     return {
       userData: null,
       userId: this.$route.params.id,
       isFeedbackExpanded: false
-    };
+    }
   },
-  mounted() {
-    this.fetchUserData();
+  mounted () {
+    this.fetchUserData()
   },
   methods: {
-    fetchUserData() {
+    fetchUserData () {
       fetch(`http://localhost:5000/user/${this.userId}`)
         .then(response => {
-          if (!response.ok) throw new Error("用户不存在或请求失败");
-          return response.json();
+          if (!response.ok) throw new Error('用户不存在或请求失败')
+          return response.json()
         })
         .then(data => {
-          this.userData = data;
+          this.userData = data
         })
         .catch(err => {
-          console.error(err);
-          this.userData = null;
-        });
+          console.error(err)
+          this.userData = null
+        })
     },
-    toggleFeedback() {
-      this.isFeedbackExpanded = !this.isFeedbackExpanded;
+    toggleFeedback () {
+      this.isFeedbackExpanded = !this.isFeedbackExpanded
     },
-    translateFeedbackKey(key) {
+    translateFeedbackKey (key) {
       const map = {
         COMMAND_FAILURE: '命令失败',
         COMMAND_SUCCESS: '命令成功',
@@ -120,19 +119,19 @@ export default {
         general_voice_volume: '语音音量',
         visual_animation_enabled: '视觉动画启用',
         visual_graphic_feedback_enabled: '视觉图形反馈启用'
-      };
-      return map[key] || key;
+      }
+      return map[key] || key
     },
-    translateFeedbackSubKey(subKey) {
+    translateFeedbackSubKey (subKey) {
       const map = {
         enabled_modalities: '启用的模态',
         voice_detail_level: '语音详细等级',
-        text_display_enabled: '文本显示启用',
-      };
-      return map[subKey] || subKey;
+        text_display_enabled: '文本显示启用'
+      }
+      return map[subKey] || subKey
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -310,4 +309,3 @@ li {
   font-size: 18px;
 }
 </style>
-```

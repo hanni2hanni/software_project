@@ -47,22 +47,22 @@ const router = new Router({
     {
       path: '/user-management',
       name: 'UserManagement',
-      component: UserManagement,
+      component: UserManagement
     },
     {
       path: '/user-detail/:id',
       name: 'UserDetail',
-      component: UserDetail,
+      component: UserDetail
     },
     {
       path: '/system-settings',
       name: 'SystemSettings',
-      component: SystemSettings,
+      component: SystemSettings
     },
     {
       path: '/system-logs',
       name: 'SystemLogs',
-      component: SystemLogs,
+      component: SystemLogs
     },
     {
       path: '/maintenance',
