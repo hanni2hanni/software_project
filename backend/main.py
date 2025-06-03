@@ -20,6 +20,10 @@ from gesture.gesture import SignRe
 from voice import record
 from user_manager import UserManager
 
+# 新增
+from log_analyzer import LogAnalyzer
+from profile_analytics import ProfileAnalytics
+
 
 LOG_FILE = 'log.txt'
 
@@ -32,7 +36,7 @@ SCENES = [
     },
     {
         'name': '场景1 分心检测',
-        'desc': '分心检测：偏离3秒触发警告，需手势/语音确认。\n输入：眼动偏离3秒，语音"已注意道路"，手势竖拇指/挥手。\n输出：红色警告栏，语音播报，警告灯闪烁。',
+        'desc': '分心检测：偏离3秒触发警告，需手势/语音确认。\n输入：眼动偏离3秒，语音"已经注意道路"，手势竖拇指/挥手。\n输出：红色警告栏，语音播报，警告灯闪烁。',
         'icon': '🚨',
         'color': '#ff3333',
         'audio1': r'E:\system\voice\temp\security_converted.wav',  # "已注意行车安全"
@@ -45,7 +49,7 @@ SCENES = [
         'color': '#3399ff',
         'color2': '#ffd700',
         'audio1': r'E:\system\voice\temp\navigation_converted.wav',  # "已开启导航"
-        'audio2': r'E:\system\voice\temp\navigation_converted.wav',  
+        'audio2': r'E:\system\voice\temp\navigation_converted.wav',
     },
     {
         'name': '场景3 音乐状态',
@@ -54,7 +58,7 @@ SCENES = [
         'color': '#33cc66',
         'color2': '#ffd700',
         'audio1': r'E:\system\voice\temp\music1_converted.wav',  # 音乐播放
-        'audio2': r'',  
+        'audio2': r'',
     },
 ]
 
@@ -214,9 +218,20 @@ class MultiModalApp:
         self.last_headpose = '静止'
 
         self.update_frame()
-        self.voice_thread = threading.Thread(target=self.voice_recognition_loop, daemon=True)
-        self.voice_thread.start()
+        # self.voice_thread = threading.Thread(target=self.voice_recognition_loop, daemon=True)
+        # self.voice_thread.start()
         self.flash_timer()
+
+        # 新增
+        self.log_analyzer = LogAnalyzer()
+        self.profile_analytics = ProfileAnalytics()
+
+    # 新增
+    def on_interaction_complete(self, mode, content):
+        # 在交互完成后调用分析
+        if hasattr(self, 'user_manager') and self.user_manager:
+            username = self.user_manager.get_current_user().username
+            self.log_analyzer.analyze_user_behavior(username)
 
     def switch_scene(self, idx):
         self.scene_idx = idx
@@ -276,7 +291,7 @@ class MultiModalApp:
         show_frame = self.gaze.annotated_frame()
         if show_frame is None:
             show_frame = frame
-        
+
         display_frame = cv2.cvtColor(show_frame, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(display_frame)
         img = img.resize((900, 480))
@@ -398,6 +413,17 @@ class MultiModalApp:
                 else:
                     self.gesture_pause_buffer.clear()
 
+        # 新增
+        # 更新用户配置
+        if hasattr(self, 'user_manager') and self.user_manager:
+            username = self.user_manager.get_current_user().username
+            self.profile_analytics.update_profile_based_on_interaction(
+                username,
+                SCENES[self.scene_idx]['name'],
+                f"{gaze_result}|{gesture_result}"
+            )
+
+
     def flash_timer(self):
         # 仪表盘和状态栏闪烁
         scene = SCENES[self.scene_idx]
@@ -411,22 +437,69 @@ class MultiModalApp:
             self.flash_flag = not self.flash_flag
         self.root.after(500, self.flash_timer)
 
+    # def voice_recognition_loop(self):
+    #     print("[DEBUG] 语音识别线程启动")
+    #     while True:
+    #         try:
+    #             print("[DEBUG] 调用record_audio()")
+    #             result = record.record_audio()
+    #             print(f"[DEBUG] record_audio返回: {result}")
+    #             if result:
+    #                 self.last_voice = result
+    #             else:
+    #                 self.last_voice = ''
+    #         except Exception as e:
+    #             self.last_voice = f'语音识别异常: {e}'
+    #             import traceback
+    #             traceback.print_exc()
+    #         time.sleep(1)
+    # def voice_recognition_loop(self):
+    #     print("[DEBUG] 语音识别线程启动")
+
+    #     def update_voice_message(msg):
+    #         self.last_voice = msg
+    #         self.result_text.config(state='normal')
+
+    #         # 先清除之前的“语音”行（找到包含“语音:”标签的行）
+    #         start = self.result_text.search("语音:", "1.0", stopindex="end")
+    #         if start:
+    #             line = start.split('.')[0]
+    #             self.result_text.delete(f"{line}.0", f"{int(line)+1}.0")
+
+    #         # 插入新的“语音”信息
+    #         self.result_text.insert(tk.END, '语音: ', 'label')
+    #         self.result_text.insert(tk.END, f'{msg}\n', 'value')
+
+    #     k    self.result_text.config(state='disabled')
+
+    #     record.record_audio_loop(update_voice_message)
     def voice_recognition_loop(self):
         print("[DEBUG] 语音识别线程启动")
-        while True:
-            try:
-                print("[DEBUG] 调用record_audio()")
-                result = record.record_audio()
-                print(f"[DEBUG] record_audio返回: {result}")
-                if result:
-                    self.last_voice = result
-                else:
-                    self.last_voice = ''
-            except Exception as e:
-                self.last_voice = f'语音识别异常: {e}'
-                import traceback
-                traceback.print_exc()
-            time.sleep(1)
+
+        def update_voice_message(msg):
+            def _update():
+                self.last_voice = msg
+                self.result_text.config(state='normal')
+
+                # 清除旧的“语音”行
+                start = self.result_text.search("语音:", "1.0", stopindex="end")
+                if start:
+                    line = start.split('.')[0]
+                    self.result_text.delete(f"{line}.0", f"{int(line)+1}.0")
+
+                # 插入新的“语音”信息
+                self.result_text.insert(tk.END, '语音: ', 'label')
+                self.result_text.insert(tk.END, f'{msg}\n', 'value')
+
+                self.result_text.config(state='disabled')
+
+            # 保证 UI 更新在主线程中执行
+            self.result_text.after(0, _update)
+
+        # 启动语音识别监听
+        record.record_audio_loop(update_voice_message)
+
+
 
     def log_result(self, mode, content):
         if not content or content == '无手势' or content == '未检测到眼动':
@@ -466,4 +539,11 @@ class MultiModalApp:
 if __name__ == '__main__':
     root = tk.Tk()
     app = MultiModalApp(root)
-    root.mainloop() 
+
+    # 新增 等待主界面完成初始化后再启动线程
+    def start_voice_thread():
+        app.voice_thread = threading.Thread(target=app.voice_recognition_loop, daemon=True)
+        app.voice_thread.start()
+    root.after(1000, start_voice_thread)  # 延迟1秒再启动线程
+
+    root.mainloop()
