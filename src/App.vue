@@ -27,6 +27,7 @@
         <p>手势：<span>{{ recognitionData.gesture }}</span></p>
         <p>头部姿态：<span>{{ recognitionData.headpose }}</span></p>
         <p>语音状态：<span>{{ recognitionData.voice }}</span></p>
+        <p v-if="isDistracted" style="color: red;">⚠️ 检测到驾驶员注意力不集中</p>
       </div>
     </div>
     <div class="content">
@@ -36,8 +37,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import * as THREE from 'three'
 import VANTA from 'vanta/src/vanta.net'
 
@@ -48,42 +48,52 @@ export default {
       vantaEffect: null,
       currentTime: '',
       acStatus: '关闭',
-      recognitionInterval: null // 定时器 ID
+      recognitionInterval: null,
+      isDistracted: false,
+      distractedStartTime: null,
+      alertAudio: null,
+      musicAudio: null // ✅ 添加音乐播放器
+
     }
   },
   computed: {
     ...mapGetters(['isLoggedIn', 'userRole', 'recognitionData'])
   },
   watch: {
-    isLoggedIn(newVal) {
+    isLoggedIn (newVal) {
       if (newVal) {
-        this.startRecognitionUpdate(); // 启动更新定时器
+        this.startRecognitionUpdate()
       } else {
-        this.stopRecognitionUpdate(); // 停止更新
+        this.stopRecognitionUpdate()
       }
     },
-    userRole(newVal) {
+    userRole (newVal) {
       if (newVal === 'driver') {
-        this.startRecognitionUpdate(); // 启动更新定时器
+        this.startRecognitionUpdate()
       } else {
-        this.stopRecognitionUpdate(); // 停止更新
+        this.stopRecognitionUpdate()
       }
     }
   },
   mounted () {
     this.initVanta()
     this.updateTime()
-    setInterval(this.updateTime, 1000) // 每秒更新一次时间
+    setInterval(this.updateTime, 1000)
+
+    // 初始化报警音频
+    this.alertAudio = new Audio(require('@/assets/alert.wav'))
+    this.musicAudio = new Audio(require('@/assets/music.mp3')) // ← 请替换成你的音乐文件路径
+    this.musicAudio.loop = true
   },
   beforeDestroy () {
     if (this.vantaEffect) {
       this.vantaEffect.destroy()
     }
-    this.stopRecognitionUpdate(); // 清除定时器
+    this.stopRecognitionUpdate()
   },
   methods: {
     ...mapActions(['fetchRecognitionResults']),
-    
+
     initVanta () {
       this.vantaEffect = VANTA({
         el: this.$refs.vantaRef,
@@ -104,107 +114,166 @@ export default {
       const now = new Date()
       this.currentTime = now.toLocaleTimeString()
     },
-    startRecognitionUpdate() {
-      // 每50毫秒更新识别结果
+    startRecognitionUpdate () {
       this.recognitionInterval = setInterval(() => {
         this.fetchRecognitionResults()
           .then(() => {
-            // 检查手势是否为挥手
-            this.checkGesture();
-          });
-      }, 50);
+            this.checkGesture()
+            this.checkDistraction()
+            this.checkVoiceCommand() // ✅ 增加语音指令检测
+          })
+      }, 50)
     },
-    stopRecognitionUpdate() {
-      // 清除定时器
+    stopRecognitionUpdate () {
       if (this.recognitionInterval) {
-        clearInterval(this.recognitionInterval);
-        this.recognitionInterval = null;
+        clearInterval(this.recognitionInterval)
+        this.recognitionInterval = null
       }
     },
-    checkGesture() {
-      // 检查手势状态
-      const { gesture } = this.recognitionData || {};
-
-      // 假设 "waving" 表示挥手
+    checkGesture () {
+      const { gesture } = this.recognitionData || {}
       if (gesture === '挥手') {
-        this.$router.push({ name: 'Navigation' }); // 跳转到 Navigation
+        this.$router.push({ name: 'Navigation' })
+        console.log('[手势控制] 检测到挥手，跳转导航页')
+      }
+      if (gesture === '握拳') {
+        if (this.musicAudio && !this.musicAudio.paused) {
+          this.musicAudio.pause()
+          console.log('[音乐控制] 握拳检测到，暂停音乐')
+        }
+      }
+    },
+
+    checkVoiceCommand () {
+      const { voice } = this.recognitionData || {}
+      if (voice && voice.includes('播放音乐')) {
+        if (this.musicAudio && this.musicAudio.paused) {
+          this.musicAudio.play()
+          console.log('[音乐控制] 语音指令触发，播放音乐')
+        }
+      }
+    },
+    checkDistraction () {
+      const { gaze, gesture, voice } = this.recognitionData || {}
+      const now = Date.now()
+
+      // 只要 gaze 不是 center，计时分心
+      const isNotCenter = gaze !== 'center'
+      if (isNotCenter) {
+        if (!this.distractedStartTime) {
+          this.distractedStartTime = now
+          console.log('[分心检测] 目光偏离中心，开始计时')
+        } else if (now - this.distractedStartTime >= 3000 && !this.isDistracted) {
+          console.log('[分心检测] 目光偏离超过 3 秒，触发分心警告')
+          this.isDistracted = true
+          this.triggerDistractionWarning()
+        }
+      } else {
+        if (this.distractedStartTime) {
+          console.log('[分心检测] 目光恢复居中，重置分心状态')
+        }
+        this.distractedStartTime = null
+      }
+
+      // 如果用户用语音或手势表明注意力恢复，则清除分心状态
+      const acknowledged = (voice && voice.includes('已注意道路')) || gesture === '竖拇指'
+      if (this.isDistracted && acknowledged) {
+        console.log('[分心检测] 用户确认已注意道路，清除分心状态')
+        this.clearDistraction()
+      }
+    },
+
+    triggerDistractionWarning () {
+      console.warn('分心警告触发！')
+      if (this.alertAudio) {
+        this.alertAudio.play()
+      }
+    },
+    clearDistraction () {
+      console.log('用户已解除分心')
+      this.isDistracted = false
+      this.distractedStartTime = null
+      if (this.alertAudio) {
+        this.alertAudio.pause()
+        this.alertAudio.currentTime = 0
       }
     }
   }
 }
+
 </script>
 
 <style>
-/* 样式保持不变 */
+/* 保持原有样式 */
 #app {
   display: flex;
   height: 100vh;
   font-family: Arial, sans-serif;
-  position: relative; /* 使绝对定位生效 */
+  position: relative;
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 15px; /* 标题底部间距 */
+  margin-bottom: 15px;
 }
 
 .nav-item {
   display: block;
-  color: #ecf0f1; /* 链接颜色 */
-  text-decoration: none; /* 去掉下划线 */
+  color: #ecf0f1;
+  text-decoration: none;
   padding: 10px;
-  margin: 5px 0; /* 链接间距 */
-  border-radius: 5px; /* 圆角效果 */
+  margin: 5px 0;
+  border-radius: 5px;
   transition: background 0.3s;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1); /* 悬停效果 */
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .status, .voice-command, .recognition-results {
-  margin-top: 20px; /* 顶部间距 */
+  margin-top: 20px;
 }
 
 .status-active {
-  color: #2ecc71; /* 在线状态颜色 */
+  color: #2ecc71;
 }
 
 .battery-level {
-  color: #f39c12; /* 电池电量颜色 */
+  color: #f39c12;
 }
 
 .current-time {
-  font-weight: bold; /* 加粗时间显示 */
-  color: #ecf0f1; /* 时间颜色 */
+  font-weight: bold;
+  color: #ecf0f1;
 }
 
 .ac-status {
-  color: #3498db; /* 空调状态颜色 */
+  color: #3498db;
 }
 
 .vanta-background {
-  position: absolute; /* 绝对定位 */
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100%; /* 填充全屏 */
-  height: 100%; /* 填充全屏 */
-  z-index: 1; /* 置于底层 */
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
 .sidebar {
-  background-color: rgba(44, 62, 80, 0.8); /* 半透明深色背景 */
+  background-color: rgba(44, 62, 80, 0.8);
   color: #ecf0f1;
   padding: 20px;
   width: 250px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-  z-index: 2; /* 置于上层 */
+  z-index: 2;
 }
 
 .content {
   flex: 1;
   padding: 20px;
-  background-color: transparent; /* 设置为透明背景 */
-  z-index: 2; /* 置于上层 */
+  background-color: transparent;
+  z-index: 2;
 }
 </style>
