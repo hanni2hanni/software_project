@@ -66,7 +66,7 @@
 <script>
 export default {
   name: 'SystemSettings',
-  data () {
+  data() {
     return {
       settings: {
         performanceMode: 'normal',
@@ -78,37 +78,84 @@ export default {
         customModes: {
           voiceFeedback: true,
           visualFeedback: true,
-          hapticFeedback: false
+          hapticFeedback: false,
         },
-        autoUpdateEnabled: false
-      }
-    }
+        autoUpdateEnabled: false,
+      },
+    };
   },
   methods: {
-    saveSettings () {
+    saveSettings() {
       this.$message({
         message: '设置已保存！',
         type: 'success',
-        duration: 2000
-      })
+        duration: 2000,
+      });
     },
-    analyzePreferences () {
+    async analyzePreferences() {
       this.$message({
         message: '正在分析用户偏好，请稍候...',
         type: 'info',
-        duration: 2000
-      })
+        duration: 2000,
+      });
 
-      setTimeout(() => {
+      setTimeout(async () => {
         this.$message({
           message: '用户偏好分析报告已生成！',
           type: 'success',
-          duration: 3000
-        })
-      }, 2000)
-    }
-  }
-}
+          duration: 2000,
+        });
+
+        // 使用 $confirm 询问是否下载报告
+        const confirmed = await this.$confirm(
+          '是否下载分析报告？',
+          '确认下载',
+          {
+            confirmButtonText: '是',
+            cancelButtonText: '否',
+            type: 'info',
+            center: true,
+          }
+        ).catch(() => false); // 捕获用户取消操作
+
+        if (confirmed) {
+          this.downloadReport();
+        }
+      }, 2000);
+    },
+    async downloadReport() {
+      try {
+        // 调用后端接口获取 PDF 文件
+        const response = await fetch('http://localhost:5000/api/generate_profile_pdf');
+        if (!response.ok) {
+          throw new Error(`HTTP 错误: ${response.status} ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'profile_analysis.pdf');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        this.$message({
+          message: 'PDF 报告下载成功！',
+          type: 'success',
+          duration: 2000,
+        });
+      } catch (error) {
+        this.$message({
+          message: `PDF 下载失败: ${error.message}`,
+          type: 'error',
+          duration: 2000,
+        });
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -232,9 +279,9 @@ button:hover {
 .back-link-container {
   margin-top: 20px;
   display: flex;
-  justify-content: center;  /* 居中对齐 */
+  justify-content: center;
   width: 100%;
-  padding-left: 0; /* 去掉多余的左内边距 */
+  padding-left: 0;
 }
 
 .back-link {
