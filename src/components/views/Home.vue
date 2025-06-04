@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="big-time">{{ currentTime }}</div> <!-- 显示当前时间 -->
-    <p>欢迎，{{ username || '用户' }} {{ userRole || '未定义' }}！</p> <!-- 显示用户名 -->
+    <p>欢迎，{{ userRole || '未定义' }} {{ username || '用户' }}！</p> <!-- 显示用户名 -->
     <p>请根据需要选择相应的功能：</p>
     <ul>
       <li>✓ 语音控制</li>

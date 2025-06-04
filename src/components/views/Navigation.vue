@@ -10,6 +10,7 @@
         placeholder="输入地址进行搜索"
         @select="handleSelect"
         clearable
+        :highlighted-item="highlightedIndex"
       >
         <template #item="{ item }">
           <div>
@@ -32,6 +33,8 @@
 
 <script>
 import AMapLoader from '@amap/amap-jsapi-loader'
+import { mapGetters } from 'vuex'
+import { watch } from 'vue'
 
 export default {
   name: 'Navigation',
@@ -41,11 +44,44 @@ export default {
       marker: null, // 当前标记点
       searchQuery: '', // 搜索框内容
       center: [116.397428, 39.90923], // 默认地图中心点
-      AMap: null // 用于存储 AMap 实例
+      AMap: null, // 用于存储 AMap 实例
+      highlightedIndex: -1, // 当前高亮的建议项索引
+      suggestions: [], // 存储搜索建议
+      audio: null // 用于播放音频
     }
+  },
+  computed: {
+    ...mapGetters(['recognitionData']) // 从 Vuex 中获取识别数据
   },
   mounted () {
     this.initMap() // 初始化地图
+    this.playAudio(); // 播放音频
+
+    // 监视 recognitionData.voice 的变化
+    watch(
+      () => this.recognitionData && this.recognitionData.voice,
+      (newVoice) => {
+        const invalidVoices = ["监听指令...", "识别失败..."];
+        if (newVoice && !invalidVoices.includes(newVoice)) {
+          this.searchQuery = newVoice; // 将有效的语音结果放入搜索框
+        }
+      }
+    );
+
+    // 监视 headpose 和 gaze 的变化
+    watch(
+      () => ({
+        headpose: this.recognitionData && this.recognitionData.headpose,
+        gaze: this.recognitionData && this.recognitionData.gaze
+      }),
+      ({ headpose, gaze }) => {
+        if (gaze === '向下看') {
+          this.switchSuggestions(); // 切换推荐框选项
+        } else if (headpose === '点头') {
+          this.performMapSearch(); // 执行地图搜索
+        }
+      }
+    )
   },
   beforeDestroy () {
     if (this.map) {
@@ -53,13 +89,21 @@ export default {
     }
   },
   methods: {
+    // 播放音频
+    playAudio() {
+      this.audio = new Audio(require('@/assets/navigation.wav')); // 加载音频文件
+      this.audio.play().catch(error => {
+        console.error('Error playing audio:', error);
+      });
+    },
+
     // 初始化地图
     async initMap () {
       window._AMapSecurityConfig = {
         securityJsCode: '0079d087436433aedd5e5d1d40c36add'
       }
 
-      this.AMap = await AMapLoader.load({ // 将 AMap 存储到组件的数据中
+      this.AMap = await AMapLoader.load({
         key: '421d9632fe6cac6c95418e8717f99608',
         version: '2.0',
         plugins: ['AMap.Marker', 'AMap.ToolBar', 'AMap.Scale', 'AMap.Autocomplete', 'AMap.PlaceSearch']
@@ -84,57 +128,73 @@ export default {
       this.map.add(this.marker)
     },
 
+    // 切换推荐框选项
+    switchSuggestions() {
+      this.fetchSuggestions(this.searchQuery, (suggestions) => {
+        this.suggestions = suggestions; // 保存当前建议
+        if (suggestions.length > 0) {
+          this.highlightedIndex = (this.highlightedIndex + 1) % suggestions.length; // 切换高亮选项
+          this.searchQuery = suggestions[this.highlightedIndex].value; // 更新搜索框内容为当前高亮项
+        }
+      });
+    },
+
+    // 执行地图搜索
+    performMapSearch() {
+      if (this.highlightedIndex >= 0 && this.suggestions.length > 0) {
+        const selectedSuggestion = this.suggestions[this.highlightedIndex];
+        this.handleSelect(selectedSuggestion); // 选择当前高亮的建议
+      }
+    },
+
     // 搜索建议
-    fetchSuggestions (queryString, callback) {
+    fetchSuggestions(queryString, callback) {
       console.log('Searching for:', queryString)
       if (!queryString) {
-        callback([])
-        return
+        callback([]);
+        return;
       }
 
-      const placeSearch = new this.AMap.PlaceSearch({ // 使用 this.AMap
+      const placeSearch = new this.AMap.PlaceSearch({
         city: '全国' // 可以根据需要指定城市
-      })
+      });
 
       placeSearch.search(queryString, (status, result) => {
-        console.log('Search status:', status)
-        console.log('Search result:', result)
+        console.log('Search status:', status);
+        console.log('Search result:', result);
         if (status === 'complete' && result.info === 'OK') {
-          // 处理数据格式，确保返回的每个对象都有一个 value 属性
           const suggestions = result.poiList.pois.map(poi => ({
             value: poi.name,
             address: poi.address,
             location: poi.location
-          }))
-          callback(suggestions)
+          }));
+          callback(suggestions);
         } else {
-          console.error('Error fetching suggestions:', result)
-          callback([])
+          console.error('Error fetching suggestions:', result);
+          callback([]);
         }
-      })
+      });
     },
 
     // 选择地址后更新地图
-    handleSelect (item) {
-      console.log('Selected item:', item)
+    handleSelect(item) {
+      console.log('Selected item:', item);
       if (item.location) {
-        // 确保 location 是一个字符串，处理不同格式
-        const location = item.location
-        let lng, lat
+        const location = item.location;
+        let lng, lat;
 
         if (typeof location === 'string') {
-          [lng, lat] = location.split(',').map(Number)
+          [lng, lat] = location.split(',').map(Number);
         } else if (location && typeof location === 'object') {
-          lng = location.lng || location[0] // 根据 API 返回的数据格式
-          lat = location.lat || location[1]
+          lng = location.lng || location[0];
+          lat = location.lat || location[1];
         }
 
-        this.center = [lng, lat]
-
-        this.map.setCenter(this.center)
-        this.marker.setPosition(this.center)
+        this.center = [lng, lat];
+        this.map.setCenter(this.center);
+        this.marker.setPosition(this.center);
       } else {
-        console.error('Selected item does not have location:', item)
+        console.error('Selected item does not have location:', item);
       }
     }
   }

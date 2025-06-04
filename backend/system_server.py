@@ -1,13 +1,23 @@
-from flask import Flask, Response, request, jsonify
+from flask import Flask, Response, request, jsonify, send_file
 from flask_cors import CORS
 import os
 import csv
 import json
+import subprocess
+import time
 
 app = Flask(__name__)
 CORS(app)
 
 USER_FILE = os.path.join(os.path.dirname(__file__), 'system_management', 'user_profiles.json')
+
+# 定义共享 PDF 文件路径
+SHARED_PDF_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../shared/pdf_reports/profile_analysis.pdf"))
+SHARED_PDF_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../car_system/backend/pdf_reports/profile_analysis.pdf"))
+
+# 定义 profile_analytics.py 的相对路径
+PROFILE_ANALYTICS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../car_system/backend/profile_analytics.py"))
+PROFILE_ANALYTICS_DIR = os.path.dirname(PROFILE_ANALYTICS_PATH)
 
 # --- 用户管理相关函数 ---
 def load_users():
@@ -113,23 +123,21 @@ def login():
     users = load_users()
     user = None
     for user_id, user_info in users.items():
-        if user_info.get("name") == username:  # 用name字段比对
+        if user_info.get("name") == username:
             user = user_info
             break
 
     if user is None:
         return jsonify({"error": "用户不存在"}), 404
 
-    # 假设每个用户都存储一个"password"字段来进行验证
-    if password != None:  # 替换为真实的密码验证逻辑
+    if password != None:
         return jsonify({
             "message": "登录成功",
-            "role": user.get("role"),  # 返回用户角色
-            "name": user.get("name")   # 返回用户名
+            "role": user.get("role"),
+            "name": user.get("name")
         })
     else:
         return jsonify({"error": "密码错误"}), 401
-
 
 # --- 日志接口 ---
 @app.route('/api/logs', methods=['GET'])
@@ -148,7 +156,70 @@ def get_logs():
     csv_data = '\n'.join(filtered_lines)
     return Response(csv_data, mimetype='text/csv')
 
+# --- 用户偏好分析接口 ---
+@app.route('/api/profile_analytics', methods=['GET'])
+def get_profile_analytics():
+    # 由于无法导入 ProfileAnalytics，使用模拟数据
+    mock_data = {
+        'common_patterns': {
+            '常用语音指令': [('已经注意道路', 5), ('语音命令', 3)],
+            '常用手势': [('竖拇指', 4), ('挥手', 2)],
+            '交互偏好': {'语音优先': [('True', 6)]}
+        },
+        'user_reports': {
+            'user1': {
+                '用户名': 'user1',
+                '常用功能总结': {'语音指令': 2, '手势': 1, '自定义快捷操作': 0},
+                '个性化推荐': {'推荐语音指令': ['语音命令'], '推荐手势': ['挥手'], '推荐交互设置': {'语音优先': 'True'}},
+                '最近使用场景': '导航确认',
+                '交互偏好': {'语音优先': True}
+            }
+        }
+    }
+    return jsonify(mock_data)
+
+# --- PDF 下载接口 ---
+@app.route('/api/generate_profile_pdf', methods=['GET'])
+def generate_profile_pdf():
+    try:
+        # 调试：打印路径
+        print(f"检查 profile_analytics.py 路径: {PROFILE_ANALYTICS_PATH}")
+        if not os.path.exists(PROFILE_ANALYTICS_PATH):
+            return jsonify({"error": f"profile_analytics.py 文件未找到: {PROFILE_ANALYTICS_PATH}"}), 404
+
+        # 触发 profile_analytics.py 运行以生成 PDF
+        print(f"触发 profile_analytics.py 运行: {PROFILE_ANALYTICS_PATH}")
+        result = subprocess.run(
+            ["python", PROFILE_ANALYTICS_PATH],
+            capture_output=True,
+            text=True,
+            timeout=30,  # 设置超时为 30 秒
+            cwd=PROFILE_ANALYTICS_DIR  # 设置工作目录
+        )
+        print(f"脚本输出: {result.stdout}")
+        if result.stderr:
+            print(f"脚本错误: {result.stderr}")
+            return jsonify({"error": f"生成 PDF 失败: {result.stderr}"}), 500
+
+        # 等待片刻以确保文件生成
+        time.sleep(1)
+
+        # 检查共享 PDF 文件是否存在
+        if not os.path.exists(SHARED_PDF_PATH):
+            return jsonify({"error": f"PDF 文件未找到: {SHARED_PDF_PATH}"}), 404
+        
+        print(f"找到文件: {SHARED_PDF_PATH}")
+        # 返回 PDF 文件流
+        return send_file(
+            SHARED_PDF_PATH,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name='profile_analysis.pdf'
+        )
+    except subprocess.TimeoutExpired:
+        return jsonify({"error": "生成 PDF 超时，请稍后重试"}), 500
+    except Exception as e:
+        return jsonify({"error": f"提供 PDF 失败: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
-

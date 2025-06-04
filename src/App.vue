@@ -15,11 +15,18 @@
         <p>当前时间: <span class="current-time">{{ currentTime }}</span></p>
         <p>当前状态: <span class="status-active">在线</span></p>
         <p>电池电量: <span class="battery-level">75%</span></p>
-        <p>空调状态: <span class="ac-status">{{ acStatus }}</span></p> <!-- 新增空调状态 -->
+        <p>空调状态: <span class="ac-status">{{ acStatus }}</span></p>
       </div>
       <div class="voice-command">
         <h3>语音指令</h3>
         <p>说出 “开始录音” 开始进行语音识别。</p>
+      </div>
+      <div v-if="userRole === 'driver'" class="recognition-results">
+        <h3>识别结果</h3>
+        <p>目光：<span>{{ recognitionData.gaze }}</span></p>
+        <p>手势：<span>{{ recognitionData.gesture }}</span></p>
+        <p>头部姿态：<span>{{ recognitionData.headpose }}</span></p>
+        <p>语音状态：<span>{{ recognitionData.voice }}</span></p>
       </div>
     </div>
     <div class="content">
@@ -29,33 +36,54 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex' // 导入 Vuex 的 getter
+import { mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
 import * as THREE from 'three'
-import VANTA from 'vanta/src/vanta.net' // 导入 Vanta
+import VANTA from 'vanta/src/vanta.net'
 
 export default {
   name: 'App',
   data () {
     return {
-      vantaEffect: null, // 存储 Vanta.js 实例
-      currentTime: '', // 当前时间
-      acStatus: '关闭' // 假设空调初始状态为关闭
+      vantaEffect: null,
+      currentTime: '',
+      acStatus: '关闭',
+      recognitionInterval: null // 定时器 ID
     }
   },
   computed: {
-    ...mapGetters(['isLoggedIn', 'userRole']) // 获取登录状态和用户角色
+    ...mapGetters(['isLoggedIn', 'userRole', 'recognitionData'])
+  },
+  watch: {
+    isLoggedIn(newVal) {
+      if (newVal) {
+        this.startRecognitionUpdate(); // 启动更新定时器
+      } else {
+        this.stopRecognitionUpdate(); // 停止更新
+      }
+    },
+    userRole(newVal) {
+      if (newVal === 'driver') {
+        this.startRecognitionUpdate(); // 启动更新定时器
+      } else {
+        this.stopRecognitionUpdate(); // 停止更新
+      }
+    }
   },
   mounted () {
-    this.initVanta() // 初始化 Vanta.js 背景效果
-    this.updateTime() // 初始化时间
+    this.initVanta()
+    this.updateTime()
     setInterval(this.updateTime, 1000) // 每秒更新一次时间
   },
   beforeDestroy () {
     if (this.vantaEffect) {
-      this.vantaEffect.destroy() // 销毁 Vanta.js 实例以防内存泄漏
+      this.vantaEffect.destroy()
     }
+    this.stopRecognitionUpdate(); // 清除定时器
   },
   methods: {
+    ...mapActions(['fetchRecognitionResults']),
+    
     initVanta () {
       this.vantaEffect = VANTA({
         el: this.$refs.vantaRef,
@@ -75,6 +103,32 @@ export default {
     updateTime () {
       const now = new Date()
       this.currentTime = now.toLocaleTimeString()
+    },
+    startRecognitionUpdate() {
+      // 每50毫秒更新识别结果
+      this.recognitionInterval = setInterval(() => {
+        this.fetchRecognitionResults()
+          .then(() => {
+            // 检查手势是否为挥手
+            this.checkGesture();
+          });
+      }, 50);
+    },
+    stopRecognitionUpdate() {
+      // 清除定时器
+      if (this.recognitionInterval) {
+        clearInterval(this.recognitionInterval);
+        this.recognitionInterval = null;
+      }
+    },
+    checkGesture() {
+      // 检查手势状态
+      const { gesture } = this.recognitionData || {};
+
+      // 假设 "waving" 表示挥手
+      if (gesture === '挥手') {
+        this.$router.push({ name: 'Navigation' }); // 跳转到 Navigation
+      }
     }
   }
 }
@@ -91,7 +145,7 @@ export default {
 
 h2 {
   text-align: center;
-  margin-bottom: 20px; /* 标题底部间距 */
+  margin-bottom: 15px; /* 标题底部间距 */
 }
 
 .nav-item {
@@ -108,8 +162,8 @@ h2 {
   background: rgba(255, 255, 255, 0.1); /* 悬停效果 */
 }
 
-.status, .voice-command {
-  margin-top: 40px; /* 顶部间距 */
+.status, .voice-command, .recognition-results {
+  margin-top: 20px; /* 顶部间距 */
 }
 
 .status-active {
