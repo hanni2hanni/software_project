@@ -415,6 +415,8 @@ from profile_analytics import ProfileAnalytics
 pdfmetrics.registerFont(TTFont('SimSun', 'simsun.ttc'))
 
 def generate_profile_analysis_pdf(output_path="pdf_reports/profile_analysis.pdf"):
+#def generate_profile_analysis_pdf(output_path=r"D:\Study\大三\软件工程\teamwork\shared\pdf_reports\profile_analysis.pdf"):
+#def generate_profile_analysis_pdf(output_path=os.path.join(os.path.dirname(__file__), "../../shared/pdf_reports/profile_analysis.pdf")):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     c = canvas.Canvas(output_path, pagesize=A4)
     c.setFont("SimSun", 12)
