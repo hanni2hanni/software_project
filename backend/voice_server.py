@@ -27,7 +27,7 @@ COMMAND_FILE = os.path.join(OUTPUT_DIR, "command.wav")  # 指令文件
 RMS_THRESHOLD = 0.0010  # RMS 能量阈值，用于 VAD
 SILENCE_DURATION = 4  # 静音持续时间（秒）
 
-has_started = False  # 标记是否已经触发“开始录音”
+has_started = False  # 标记是否已经触发“小贝”
 
 
 # 配置 AssemblyAI API
@@ -129,9 +129,9 @@ command_handlers = {
     "打開導航": handle_open_navigation,
     "關閉音樂": handle_close_music
 }
-#实时监听麦克风输入，并检测是否说出了“开始录音”，作为触发词来启动录音过程。
+#实时监听麦克风输入，并检测是否说出了“小贝”，作为触发词来启动录音过程。
 def record_trigger():
-    """监听触发词 '开始录音'"""
+    """监听触发词 '小贝'"""
     audio = pyaudio.PyAudio()
     # 打开音频流，用于实时读取麦克风数据
     stream = audio.open(format=pyaudio.paInt16,
@@ -139,8 +139,8 @@ def record_trigger():
                         rate=SAMPLE_RATE,
                         input=True,
                         frames_per_buffer=CHUNK)
-    message_queue.put("正在监听触发词“开始录音”...")
-    #print("监听中，请说 '开始录音' 触发录音...")
+    message_queue.put("正在监听触发词“小贝”...")
+    #print("监听中，请说 '小贝' 触发录音...")
     frames = []
     silence_counter = 0
     recording = False
@@ -177,12 +177,12 @@ def record_trigger():
         wf.setsampwidth(SAMPLE_WIDTH)
         wf.setframerate(SAMPLE_RATE)
         wf.writeframes(b''.join(frames))
-    #将录音转换为文字，检查是否包含关键词 "开始录音"
+    #将录音转换为文字，检查是否包含关键词 "小贝"
     text = transcribe_audio(TRIGGER_FILE)
     message_queue.put(f"触发词识别结果：{text}")
-    if text and any(keyword in text for keyword in ["开始录音", "開始錄音"]):
-        #print("检测到触发词 '开始录音'")
-        message_queue.put("✅ 检测到触发词“开始录音”")
+    if text and any(keyword in text for keyword in ["小贝", "小貝","小北","嘿，小贝", "嘿，小貝","你好，小贝", "你好，小貝","小贝，启动", "小貝，啟動","小贝，嘿", "小貝，嘿","小辈", "小輩","小杯","小蓓"]):
+        #print("检测到触发词 '小贝'")
+        message_queue.put("✅ 检测到触发词“小贝”")
         return True
     else:
         #print(f"未检测到触发词，识别结果: {text}")
@@ -273,9 +273,9 @@ def record_audio_async():
         message_queue.put("🎙️ 语音助手开始监听（直到点击按钮手动关闭）...")
         while is_listening:
             if not has_started:
-                # 还没触发“开始录音”，监听触发词
+                # 还没触发“小贝”，监听触发词
                 if record_trigger():
-                    message_queue.put("✅ 检测到触发词“开始录音”，进入指令监听模式")
+                    message_queue.put("✅ 检测到触发词“小贝”，进入指令监听模式")
                     has_started = True
                 else:
                     time.sleep(1)
