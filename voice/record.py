@@ -132,18 +132,29 @@ command_handlers = {
     "打开导航": handle_open_navigation,
     "关闭音乐": handle_close_music
 }
+# trigger_keywords = {
+#     "开始录音",
+#     "開始錄音",
+#     "开始录入",
+#     "开始录音吧",
+#     "请开始录音",
+#     "录音开始",
+#     "我要开始录音"
+# }
 trigger_keywords = {
-    "开始录音",
-    "開始錄音",
-    "开始录入",
-    "开始录音吧",
-    "请开始录音",
-    "录音开始",
-    "我要开始录音"
+    "小贝", "小貝",         # 基础简繁形式
+    "小北",                # 简繁相同，误识别为běi
+    "嘿，小贝", "嘿，小貝",  # 前缀“嘿”的简繁变体
+    "你好，小贝", "你好，小貝",  # 前缀“你好”的简繁变体
+    "小贝，启动", "小貝，啟動",  # 带“启动/啟動”的简繁变体
+    "小贝，嘿", "小貝，嘿",    # 后缀“嘿”的简繁变体
+    "小辈", "小輩",         # 误识别为“辈/輩”
+    "小杯",                # 简繁相同，误识别为bēi
+    "小蓓"                 # 简繁相同，误识别为bèi
 }
 
 def record_trigger():
-    """监听触发词 '开始录音'"""
+    """监听触发词 '小贝'"""
     audio = pyaudio.PyAudio()
     stream = audio.open(format=pyaudio.paInt16,
                         channels=CHANNELS,
@@ -151,7 +162,7 @@ def record_trigger():
                         input=True,
                         frames_per_buffer=CHUNK)
 
-    print("监听中，请说 '开始录音' 触发录音...")
+    print("监听中，请说 '小贝' 触发录音...")
     frames = []
     silence_counter = 0
     recording = False
@@ -190,13 +201,7 @@ def record_trigger():
 
 
 
-    # text = transcribe_audio(TRIGGER_FILE)
-    # if text and any(keyword in text for keyword in ["开始录音", "開始錄音"]):
-    #     print("检测到触发词 '开始录音'")
-    #     return True
-    # else:
-    #     print(f"未检测到触发词，识别结果: {text}")
-    #     return False
+
     text = transcribe_audio(TRIGGER_FILE)
     if text:
         for keyword in trigger_keywords:
