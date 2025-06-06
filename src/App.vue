@@ -36,8 +36,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import * as THREE from 'three'
 import VANTA from 'vanta/src/vanta.net'
 
