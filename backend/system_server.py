@@ -11,12 +11,31 @@ CORS(app)
 
 USER_FILE = os.path.join(os.path.dirname(__file__), 'system_management', 'user_profiles.json')
 
-# 定义共享 PDF 文件路径
-SHARED_PDF_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../shared/pdf_reports/profile_analysis.pdf"))
-SHARED_PDF_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../car_system/backend/pdf_reports/profile_analysis.pdf"))
 
-# 定义 profile_analytics.py 的相对路径
-PROFILE_ANALYTICS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../car_system/backend/profile_analytics.py"))
+def find_profile_analytics_and_pdf_path(start_path):
+    """
+    从 start_path 向上查找，直到找到包含 backend/profile_analytics.py 的目录。
+    返回 profile_analytics.py 的路径和 PDF 文件的路径。
+    """
+    current_path = os.path.abspath(start_path)
+    
+    # 向上遍历直到找到 profile_analytics.py 或到达文件系统根目录
+    while True:
+        for root, dirs, files in os.walk(current_path):
+            if "profile_analytics.py" in files and root.endswith(os.path.join("backend")):
+                profile_analytics_path = os.path.join(root, "profile_analytics.py")
+                root_dir = os.path.basename(os.path.dirname(root)) 
+                pdf_path = os.path.join(os.path.dirname(root), "backend", "pdf_reports", "profile_analysis.pdf")
+                return profile_analytics_path, pdf_path
+        
+        # 向上移动一级目录
+        parent_path = os.path.dirname(current_path)
+        if parent_path == current_path: 
+            raise FileNotFoundError("未找到 profile_analytics.py 文件")
+        current_path = parent_path
+
+# 动态查找文件路径
+PROFILE_ANALYTICS_PATH, SHARED_PDF_PATH = find_profile_analytics_and_pdf_path(os.path.dirname(__file__))
 PROFILE_ANALYTICS_DIR = os.path.dirname(PROFILE_ANALYTICS_PATH)
 
 # --- 用户管理相关函数 ---
@@ -189,26 +208,33 @@ def generate_profile_pdf():
 
         # 触发 profile_analytics.py 运行以生成 PDF
         print(f"触发 profile_analytics.py 运行: {PROFILE_ANALYTICS_PATH}")
-        result = subprocess.run(
-            ["python", PROFILE_ANALYTICS_PATH],
-            capture_output=True,
-            text=True,
-            timeout=30,  # 设置超时为 30 秒
-            cwd=PROFILE_ANALYTICS_DIR  # 设置工作目录
-        )
+        try:
+            result = subprocess.run(
+                ["python", PROFILE_ANALYTICS_PATH],
+                capture_output=True,
+                text=True,
+                timeout=30,  # 设置超时为 30 秒
+                cwd=PROFILE_ANALYTICS_DIR  # 设置工作目录
+            )
+        except Exception as e:
+            print(f"运行 profile_analytics.py 失败: {str(e)}")
+            return jsonify({"error": f"运行 profile_analytics.py 失败: {str(e)}"}), 500
+
         print(f"脚本输出: {result.stdout}")
         if result.stderr:
             print(f"脚本错误: {result.stderr}")
             return jsonify({"error": f"生成 PDF 失败: {result.stderr}"}), 500
 
         # 等待片刻以确保文件生成
-        time.sleep(1)
+        time.sleep(3)  # 增加等待时间
 
         # 检查共享 PDF 文件是否存在
+        print(f"检查 PDF 文件是否存在: {SHARED_PDF_PATH}")
         if not os.path.exists(SHARED_PDF_PATH):
             return jsonify({"error": f"PDF 文件未找到: {SHARED_PDF_PATH}"}), 404
         
         print(f"找到文件: {SHARED_PDF_PATH}")
+        print(f"文件大小: {os.path.getsize(SHARED_PDF_PATH)} 字节")
         # 返回 PDF 文件流
         return send_file(
             SHARED_PDF_PATH,
