@@ -15,11 +15,10 @@
         <p>当前时间: <span class="current-time">{{ currentTime }}</span></p>
         <p>当前状态: <span class="status-active">在线</span></p>
         <p>电池电量: <span class="battery-level">75%</span></p>
-        <p>空调状态: <span class="ac-status">{{ acStatus }}</span></p>
       </div>
-      <div class="voice-command">
+      <div v-if="userRole === 'driver'" class="voice-command">
         <h3>语音指令</h3>
-        <p>说出 “开始录音” 开始进行语音识别。</p>
+        <p>呼唤 “ 小贝 ” 开始语音指令识别</p>
       </div>
       <div v-if="userRole === 'driver'" class="recognition-results">
         <h3>识别结果</h3>
@@ -47,7 +46,6 @@ export default {
     return {
       vantaEffect: null,
       currentTime: '',
-      acStatus: '关闭',
       recognitionInterval: null,
       isDistracted: false,
       distractedStartTime: null,
@@ -61,14 +59,14 @@ export default {
   },
   watch: {
     isLoggedIn (newVal) {
-      if (newVal) {
+      if (newVal && this.userRole === 'driver') {
         this.startRecognitionUpdate()
       } else {
         this.stopRecognitionUpdate()
       }
     },
     userRole (newVal) {
-      if (newVal === 'driver') {
+      if (this.isLoggedIn && newVal === 'driver') {
         this.startRecognitionUpdate()
       } else {
         this.stopRecognitionUpdate()
@@ -82,6 +80,7 @@ export default {
 
     // 初始化报警音频
     this.alertAudio = new Audio(require('@/assets/alert.wav'))
+    this.alertAudio.loop = true;
     this.musicAudio = new Audio(require('@/assets/music.mp3')) // ← 请替换成你的音乐文件路径
     this.musicAudio.loop = true
   },
@@ -154,53 +153,63 @@ export default {
       }
     },
     checkDistraction () {
-      const { gaze, gesture, voice } = this.recognitionData || {}
-      const now = Date.now()
+      const { gaze, gesture, voice } = this.recognitionData || {};
+      const now = Date.now();
 
-      // 只要 gaze 不是 center，计时分心
-      const isNotCenter = gaze !== 'center'
+      // 检查目光是否偏离中心
+      const isNotCenter = gaze !== '眼睛居中';
+
       if (isNotCenter) {
+        // 如果目光偏离中心，开始计时
         if (!this.distractedStartTime) {
-          this.distractedStartTime = now
-          console.log('[分心检测] 目光偏离中心，开始计时')
-        } else if (now - this.distractedStartTime >= 3000 && !this.isDistracted) {
-          console.log('[分心检测] 目光偏离超过 3 秒，触发分心警告')
-          this.isDistracted = true
-          this.triggerDistractionWarning()
+          this.distractedStartTime = now;
+          console.log('[分心检测] 目光偏离中心，开始计时');
+        } else if (now - this.distractedStartTime >= 5000 && !this.isDistracted) {
+          // 累计时间超过 5 秒，触发警告
+          console.log('[分心检测] 目光偏离超过 5 秒，触发分心警告');
+          this.isDistracted = true;
+          this.triggerDistractionWarning(); // 播放警告音频
         }
       } else {
+        // 目光恢复居中，重置分心状态
         if (this.distractedStartTime) {
-          console.log('[分心检测] 目光恢复居中，重置分心状态')
+          console.log('[分心检测] 目光恢复居中，重置分心状态');
+          this.clearDistraction();
         }
-        this.distractedStartTime = null
+        this.distractedStartTime = null; // 清空计时器
       }
 
-      // 如果用户用语音或手势表明注意力恢复，则清除分心状态
-      const acknowledged = (voice && voice.includes('已注意道路')) || gesture === '竖拇指'
+      // 检查用户是否确认已注意道路
+      const acknowledged = (voice && (voice.includes('已注意道路') || voice.includes('注意道路'))) || gesture === '竖拇指';
       if (this.isDistracted && acknowledged) {
-        console.log('[分心检测] 用户确认已注意道路，清除分心状态')
-        this.clearDistraction()
+        console.log('[分心检测] 用户确认已注意道路，清除分心状态');
+        this.clearDistraction();
+      }
+
+      // 确保警告音频在分心状态下循环播放
+      if (this.isDistracted) {
+        this.triggerDistractionWarning();
       }
     },
 
     triggerDistractionWarning () {
-      console.warn('分心警告触发！')
-      if (this.alertAudio) {
-        this.alertAudio.play()
+      console.warn('分心警告触发！');
+      if (this.alertAudio && this.alertAudio.paused) {
+        this.alertAudio.play(); // 播放音频
       }
     },
+
     clearDistraction () {
-      console.log('用户已解除分心')
-      this.isDistracted = false
-      this.distractedStartTime = null
+      console.log('用户已解除分心');
+      this.isDistracted = false;
+      this.distractedStartTime = null;
       if (this.alertAudio) {
-        this.alertAudio.pause()
-        this.alertAudio.currentTime = 0
+        this.alertAudio.pause(); // 暂停播放音频
+        this.alertAudio.currentTime = 0; // 重置音频播放位置
       }
     }
   }
 }
-
 </script>
 
 <style>
@@ -246,10 +255,6 @@ h2 {
 .current-time {
   font-weight: bold;
   color: #ecf0f1;
-}
-
-.ac-status {
-  color: #3498db;
 }
 
 .vanta-background {
